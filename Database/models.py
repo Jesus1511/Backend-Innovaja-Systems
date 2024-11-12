@@ -28,7 +28,7 @@ class LoginRequest(BaseModel):
 class getCurrentRequest(BaseModel):
     id: int
 
-class deleteRequest(BaseModel):
+class DeleteRequest(BaseModel):
     token: str
 
 class TokenData(BaseModel):

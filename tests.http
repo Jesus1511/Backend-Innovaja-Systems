@@ -7,10 +7,10 @@ POST http://127.0.0.1:8000/users/singin        HTTP/1.1
 content-type: application/json
 
 {
-    "username": "str2",
-    "email": "str23",
-    "password": "str",
-    "dni": 32
+    "username": "jesús",
+    "email": "jdzc1511@gmail.com",
+    "password": "Ciro.1ABCDE",
+    "dni": 33468749
 }
 
 ####
@@ -19,8 +19,8 @@ POST http://127.0.0.1:8000/users/login
 Content-Type: application/json
 
 {
-  "email": "str23",
-  "password": "str"
+  "email": "jdzc1511@gmail.com",
+  "password": "Ciro.1ABCDE"
 }
 
 ####
@@ -28,9 +28,13 @@ POST http://127.0.0.1:8000/users/deleteUser
 Content-Type: application/json
 
 {
-    "id": 4
+    "id": 5
 }
 
 ####
 GET http://127.0.0.1:8000/users/current
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzdHIyMyIsImV4cCI6MTczMTA0NzcxNH0.qciy32vAthWycp3VcAPO82OeRCmD475Ov07NGinXODA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqZHpjMTUxMUBnbWFpbC5jb20iLCJleHAiOjE3MzEzOTk4ODd9.KPlSg6gKEnm_WrMI9BvGf04T-ThXlGrfewHrEQjQ-G0
+
+###
+POST http://127.0.0.1:8000/users/logout
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqZHpjMTUxMUBnbWFpbC5jb20iLCJleHAiOjE3MzEzOTk3NDJ9.KeX_kz3ujSC1wZN9AdVb1lbf6nwPXXABLIpDFqGxkTc

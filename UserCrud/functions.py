@@ -12,7 +12,14 @@ from jose import JWTError, jwt # type: ignore
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
-async def singIn(user: UserIn):
+revoked_tokens = set()
+
+def is_token_revoked(token: str) -> bool:
+    return token in revoked_tokens
+
+
+
+async def signIn(user: UserIn):
     query = select(User).where((User.email == user.email) | (User.dni == user.dni))
     existing_user = await database.fetch_one(query)
     
@@ -56,8 +63,31 @@ async def logIn(email: str, password: str):
         raise HTTPException(status_code=400, detail="incorrect email or password")
 
 
-async def logOut(email: str):
-    return
+async def logOut(token: str = Depends(oauth2_scheme)):
+    try:
+        # Decodifica el token para obtener el correo o ID del usuario
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        email = payload.get("sub")
+        
+        if email is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Token inválido"
+            )
+        
+        # Agregar el token a una lista de tokens revocados
+        revoked_tokens.add(token)
+
+        return JSONResponse(
+            status_code=200,
+            content={"message": "Logout exitoso"}
+        )
+
+    except JWTError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token inválido"
+        )
 
 
 async def deleteUser(id:int):
@@ -74,10 +104,16 @@ async def deleteUser(id:int):
       raise HTTPException(status_code=400, detail="User dosn't exist")
 
 
-async def get_current_user(token:str = Depends(oauth2_scheme)):
+async def get_current_user(token: str = Depends(oauth2_scheme)):
+    if is_token_revoked(token):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token revocado. Por favor, inicia sesión de nuevo."
+        )
+    
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
+        detail="No se pudieron validar las credenciales",
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
@@ -88,8 +124,13 @@ async def get_current_user(token:str = Depends(oauth2_scheme)):
         token_data = TokenData(email=email)
     except JWTError:
         raise credentials_exception
+    
     user = session.query(User).filter(User.email == token_data.email).first()
     if user is None:
         raise credentials_exception
     return user
+
+
+
+
 
